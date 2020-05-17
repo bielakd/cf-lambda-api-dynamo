@@ -1,5 +1,9 @@
+set -e
+
 echo "---*** Packaging Lambda"
 echo $1
+
+
 BUCKET_NAME=bia-cf-python-aws
 S3_KEY=LambdaArtifact
 ODW=$PWD
@@ -9,7 +13,7 @@ ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 S3_BUCKET="$BUCKET_NAME-$ACCOUNT_ID"
 
 
-#sh ./lambda_package.sh
+sh ./lambda_package.sh
 
 cd ../target
 FILE_NAME=$(ls *:latest.zip)
