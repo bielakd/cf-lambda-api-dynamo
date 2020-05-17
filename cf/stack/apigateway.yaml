@@ -2,13 +2,20 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: "API Gateway"
 
 Parameters:
+
   ApiName:
     Type: String
     Default: "cf-lambda-dynamo"
+
+  ApiStageName:
+    Type: String
+    Default: "test"
+
   FunctionArn:
     Type: String
 
 Resources:
+
   ApiGateway:
     Type: "AWS::ApiGateway::RestApi"
     Properties:
@@ -17,7 +24,30 @@ Resources:
   LambdaPermission:
     Type: "AWS::Lambda::Permission"
     Properties:
-      Action: "lambda:inovkeFunction"
+      Action: "lambda:InvokeFunction"
       FunctionName: !Ref "FunctionArn"
       Principal: "apigateway.amazonaws.com"
-      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET"
+      SourceArn: !Sub "arn:${AWS::Partition}:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET"
+
+
+  ApiGatewayMethod:
+    Type: "AWS::ApiGateway::Method"
+    Properties:
+      AuthorizationType: "NONE"
+      HttpMethod: "GET"
+      ResourceId: !GetAtt "ApiGateway.RootResourceId"
+      RestApiId: !Ref "ApiGateway"
+      Integration:
+        IntegrationHttpMethod: "GET"
+        Type: "AWS_PROXY"
+        Uri: !Sub "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${FunctionArn}/invocations"
+
+  ApiGatewayDeploy:
+    Type: "AWS::ApiGateway::Deployment"
+    DependsOn: "ApiGatewayMethod"
+    Properties:
+      RestApiId: !Ref "ApiGateway"
+      StageName: !Ref "ApiStageName"
+
+
+

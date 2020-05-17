@@ -7,7 +7,7 @@ Parameters:
     MinLength: '1'
     MaxLength: '2048'
     Type: String
-    Default: "CorrelationId"
+    Default: "correlationId"
 
   KeyType:
     AllowedPattern: '[S|N]'

@@ -35,12 +35,13 @@ zip -g function.zip app.py
 zip -r function.zip dynamo_db
 ls
 
+HASH=$(shasum -a 1 function.zip | awk '{ print $1 }')
 
-mv function.zip ../target/function:${commit}:latest.zip
-FILE_NAME=function:${commit}:latest.zip
+mv function.zip ../target/function:${HASH}:latest.zip
+FILE_NAME=function:${HASH}:latest.zip
 
 for f in ../target/*:latest.zip; do
-  if ! [[ $f =~ $commit ]]; then
+  if ! [[ $f =~ $HASH ]]; then
     mv "$f" "${f%:latest.zip}.zip"
   fi
 done

@@ -35,6 +35,7 @@ Resources:
       Code:
         S3Bucket: !Ref "S3BucketName"
         S3Key: !Ref "LambdaArtifactKey"
+
   LambdaRole:
     Type: "AWS::IAM::Role"
     Properties:
@@ -48,10 +49,11 @@ Resources:
                   - "logs:CreateLogGroup"
                   - "logs:CreateLogStream"
                   - "logs:PutLogEvents"
+                  - "dynamodb:*"
 
                 Effect: "Allow"
                 Resource:
-                  - "arn:aws:logs:*:*:*"
+                  - "*"
           PolicyName: !Sub "${LambdaName}-policy"
 
       AssumeRolePolicyDocument:
