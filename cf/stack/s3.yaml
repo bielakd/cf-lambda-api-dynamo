@@ -1,0 +1,41 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Create S3 bucket"
+
+Parameters:
+  BucketName:
+    Type: String
+    Description: "Bucket Name"
+
+
+
+Resources:
+  S3Artifactory:
+    Type: "AWS::S3::Bucket"
+    DeletionPolicy: "Delete"
+    Properties:
+      BucketName: !Sub "${BucketName}"
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: "AES256"
+
+  S3ArtifactoryPolicy:
+    Type: "AWS::S3::BucketPolicy"
+    Properties:
+      Bucket: !Ref "S3Artifactory"
+      PolicyDocument:
+        Statement:
+          - Action: "s3:*"
+            Effect: "Deny"
+            Principal: "*"
+            Resource:
+              - !Join ['',['arn:','AWS::Partition:','s3:::',!Ref "S3Artifactory", "/*"]]
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+
+Outputs:
+  BucketArn:
+    Value: !GetAtt "S3Artifactory.Arn"
+  BucketName:
+    Value: !Ref "S3Artifactory"

@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Creates Dynamo DB Table"
+
+Parameters:
+  KeyName:
+    AllowedPattern: '[a-zA-Z09]*'
+    MinLength: '1'
+    MaxLength: '2048'
+    Type: String
+    Default: "CorrelationId"
+
+  KeyType:
+    AllowedPattern: '[S|N]'
+    MinLength: '1'
+    MaxLength: '1'
+    Type: String
+    Default: 'S'
+
+  ReadCapacityUnits:
+    MinValue: "5"
+    MaxValue: "1000"
+    Type: Number
+    Default: "5"
+
+  WriteCapacityUnits:
+    MinValue: "5"
+    MaxValue: "1000"
+    Type: Number
+    Default: "10"
+
+
+Resources:
+  DynDbTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      TableName: !Sub "bi-dynamodb-${AWS::AccountId}"
+      AttributeDefinitions:
+        - AttributeName: !Ref "KeyName"
+          AttributeType: !Ref "KeyType"
+      KeySchema:
+        - AttributeName: !Ref "KeyName"
+          KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: !Ref ReadCapacityUnits
+        WriteCapacityUnits: !Ref WriteCapacityUnits
+Outputs:
+  TableName:
+    Value: !Ref "DynDbTable"

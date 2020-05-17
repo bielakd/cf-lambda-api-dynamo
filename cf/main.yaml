@@ -1,0 +1,32 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Stack deployment"
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: "Value passed from the deployment script"
+  LambdaArtifactKey:
+    Type: String
+    Description: "Value passed from the deployment script"
+
+Resources:
+  LambdaTemplate:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/lambda.yaml"
+      Parameters:
+        S3BucketName: !Ref "S3BucketName"
+        LambdaArtifactKey: !Ref "LambdaArtifactKey"
+
+  DynamoDB:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/dynamodbtable.yaml"
+
+  APIGateway:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/apigateway.yaml"
+      Parameters:
+        FunctionArn: !GetAtt "LambdaTemplate.Outputs.FunctionArn"
+
+

@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "API Gateway"
+
+Parameters:
+  ApiName:
+    Type: String
+    Default: "cf-lambda-dynamo"
+  FunctionArn:
+    Type: String
+
+Resources:
+  ApiGateway:
+    Type: "AWS::ApiGateway::RestApi"
+    Properties:
+      Name: !Sub "${ApiName}-${AWS::AccountId}"
+
+  LambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      Action: "lambda:inovkeFunction"
+      FunctionName: !Ref "FunctionArn"
+      Principal: "apigateway.amazonaws.com"
+      SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*/GET"

@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: "Lambda Deployment"
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: "Value passed from the deployment script"
+  LambdaArtifactKey:
+    Type: String
+    Description: "Value passed from the deployment script"
+  LambdaName:
+    Type: String
+    Default: "cf-dynamo-access"
+  LambdaHandler:
+    Type: String
+    Default: "app.handler"
+  LambdaMemorySize:
+    Type: Number
+    Default: 128
+  LambdaRuntime:
+    Type: String
+    Default: "python3.8"
+
+
+Resources:
+
+  LambdaFn:
+    Type: "AWS::Lambda::Function"
+    Properties:
+      FunctionName: !Ref "LambdaName"
+      Handler: !Ref "LambdaHandler"
+      MemorySize: !Ref "LambdaMemorySize"
+      Runtime: !Ref "LambdaRuntime"
+      Role: !GetAtt "LambdaRole.Arn"
+      Timeout: 10
+      Code:
+        S3Bucket: !Ref "S3BucketName"
+        S3Key: !Ref "LambdaArtifactKey"
+  LambdaRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      Policies:
+        - PolicyDocument:
+            Version: "2012-10-17"
+
+            Statement:
+
+              - Action:
+                  - "logs:CreateLogGroup"
+                  - "logs:CreateLogStream"
+                  - "logs:PutLogEvents"
+
+                Effect: "Allow"
+                Resource:
+                  - "arn:aws:logs:*:*:*"
+          PolicyName: !Sub "${LambdaName}-policy"
+
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Action:
+              - "sts:AssumeRole"
+            Effect: "Allow"
+            Principal:
+              Service:
+                - "lambda.amazonaws.com"
+
+Outputs:
+  FunctionArn:
+    Value: !GetAtt "LambdaFn.Arn"
+    Export:
+      Name: "FunctionArn"
