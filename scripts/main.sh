@@ -43,16 +43,3 @@ fi
 
 
 
-
-#
-#
-#sh ./lambda_package.sh
-#
-#cd ../target
-#FILE_NAME=$(ls *:latest.zip)
-#cd $ODW
-#
-#KEY="$S3_KEY/$FILE_NAME"
-#sh ./deployToS3.sh $S3_BUCKET $KEY $FILE_NAME
-#sh ./deploystack.sh -o $1 $S3_BUCKET $KEY
-

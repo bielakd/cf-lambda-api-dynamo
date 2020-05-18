@@ -9,18 +9,20 @@ Parameters:
     Description: "Value passed from the deployment script"
 
 Resources:
+  DynamoDB:
+    Type: "AWS::CloudFormation::Stack"
+    Properties:
+      TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/dynamodbtable.yaml"
+
   LambdaTemplate:
     Type: "AWS::CloudFormation::Stack"
+    DependsOn: "DynamoDB"
     Properties:
       TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/lambda.yaml"
       Parameters:
         S3BucketName: !Ref "S3BucketName"
         LambdaArtifactKey: !Ref "LambdaArtifactKey"
-
-  DynamoDB:
-    Type: "AWS::CloudFormation::Stack"
-    Properties:
-      TemplateURL: !Sub "https://s3-${AWS::Region}.amazonaws.com/${S3BucketName}/stack/dynamodbtable.yaml"
+        DynamoTable: !GetAtt "DynamoDB.Outputs.TableName"
 
   APIGateway:
     Type: "AWS::CloudFormation::Stack"

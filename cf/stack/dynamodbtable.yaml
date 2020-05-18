@@ -46,3 +46,5 @@ Resources:
 Outputs:
   TableName:
     Value: !Ref "DynDbTable"
+    Export:
+      Name: "TableName"

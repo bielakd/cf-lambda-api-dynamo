@@ -7,6 +7,8 @@ Parameters:
   LambdaArtifactKey:
     Type: String
     Description: "Value passed from the deployment script"
+  DynamoTable:
+    Type: String
   LambdaName:
     Type: String
     Default: "cf-dynamo-access"
@@ -31,6 +33,10 @@ Resources:
       MemorySize: !Ref "LambdaMemorySize"
       Runtime: !Ref "LambdaRuntime"
       Role: !GetAtt "LambdaRole.Arn"
+      Environment:
+        Variables:
+          DYNAMO_TABLE: !Ref "DynamoTable"
+          REGION: !Ref "AWS::Region"
       Timeout: 10
       Code:
         S3Bucket: !Ref "S3BucketName"
